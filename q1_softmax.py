@@ -64,7 +64,11 @@ def test_softmax():
     """
     print "Running your tests..."
     ### YOUR CODE HERE
-    raise NotImplementedError
+    t1 = np.array([1,2,3,222,-100])
+    t1 = np.sum(softmax(t1))
+    print(t1)
+
+
     ### END YOUR CODE  
 
 if __name__ == "__main__":
