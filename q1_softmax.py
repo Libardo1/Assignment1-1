@@ -1,5 +1,18 @@
 import numpy as np
 import random
+import unittest
+from math import isnan
+
+
+#fuction to normalize an array
+def normalize(arr):
+    size = len(arr)
+    sum_all = np.sum(arr)
+    y = np.ndarray(shape=(size), dtype=float)
+    for i in range(size):
+        y[i] = arr[i]/sum_all
+    return y
+
 
 def softmax(x):
     """
@@ -21,12 +34,22 @@ def softmax(x):
     """
 
     ### YOUR CODE HERE
+
+    #when x is an one dimensional input
+    #we transform it in an array having
+    #x as its only mem
     if type(x[0]) != np.ndarray:
         x = x.reshape((1, len(x)))
+
     nrows = len(x)
     ncols = len(x[0])
     y = np.ndarray(shape=(nrows,ncols), dtype=float)
     for i,row in enumerate(x):
+
+    	#when the array has a high std we normalize the array
+        if np.std(row) >= 290:
+            row = normalize(row)
+
         mean = np.mean(row)
         y[i] = np.exp(row - mean)/np.sum(np.exp(row - mean))
     ### END YOUR CODE
