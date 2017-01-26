@@ -56,6 +56,15 @@ def gradcheck_naive(f, x):
         reldiff = abs(numgrad - grad[ix]) / max(1, abs(numgrad), abs(grad[ix]))
         all_dif[ix] = reldiff
         if reldiff > 1e-5:
+            print("x[ix] = ", x[ix])
+            print("x_plus_h[ix] = ", x_plus_h[ix])
+            print("x_minus_h[ix] = ", x_minus_h[ix])
+            print("fx = ", fx)
+            print("fxh_minus = ", fxh_minus)
+            print("fxh_plus = ", fxh_plus)
+            print("1/(2*h)", 1/(2*h))
+            print("numgrad = ", numgrad)
+            print("grad[ix] = ", grad[ix])
             print("First gradient error found at index %s" % str(ix))
             print("Your gradient: %f \t Numerical gradient: %f" % (grad[ix],
                                                                    numgrad))
@@ -86,12 +95,66 @@ class TestGrad(unittest.TestCase):
     def test_sigmoid(self):
         sig = lambda x: (sigmoid(x), sigmoid_grad(sigmoid(x)))
 
-        random_ints = np.random.randint(1, 100, 300)
-        random_floats = np.random.random_sample((300,))
+        random_ints = np.random.randint(1, 100, 100)
+        random_floats = np.random.random_sample((100,))
         random_floats = random_ints*random_floats
         for number in random_floats:
             result = gradcheck_naive(sig, np.array(number))
             self.assertTrue(float(result) <= 1e-5)
+
+    def test_polynomial1(self):
+        poly = lambda x: (x[0]**2 + x[1]**2,
+                          np.array([2*x[0], 2*x[1]]))
+
+        random_ints1 = np.random.randint(1, 100, 100)
+        random_ints2 = np.random.randint(1, 100, 100)
+        random_floats = np.random.random_sample((100,))
+        random_floats1 = random_ints1*random_floats
+        random_floats2 = random_ints2*random_floats
+        tuples = np.array(zip(random_floats1, random_floats2))
+        for tuple in tuples:
+            result = gradcheck_naive(poly, tuple)
+            self.assertTrue(np.sum(result) <= 2*1e-5)
+
+    def test_polynomial2(self):
+        poly = lambda x: (x[0]**2 + x[1]**3 + x[2]**4,
+                          np.array([2*x[0], 3*x[1]**2, 4*x[2]**3]))
+
+        random_ints1 = np.random.randint(1, 100, 100)
+        random_ints2 = np.random.randint(1, 100, 100)
+        random_ints3 = np.random.randint(-100, -10, 100)
+        random_floats = np.random.random_sample((100,))
+        random_floats1 = random_ints1*random_floats
+        random_floats2 = random_ints2*random_floats
+        random_floats3 = random_ints3*random_floats
+        triples = np.array(zip(random_floats1, random_floats2, random_floats3))
+        for triple in triples:
+            result = gradcheck_naive(poly, triple)
+            self.assertTrue(np.sum(result) <= 3*1e-5)
+
+    def test_polynomial3(self):
+        """
+        My test do not pass if I use np.exp() in the pol
+        """
+        poly = lambda x: (x[0]**2 + x[1]**3 - 8*np.log(x[2]) + np.log(x[3]),
+                          np.array([2*x[0], 3*x[1]**2, -8/x[2], 1/x[3]]))
+
+        random_ints1 = np.random.randint(1, 100, 100)
+        random_ints2 = np.random.randint(1, 100, 100)
+        random_ints3 = np.random.randint(1, 100, 100)
+        random_ints4 = np.random.randint(1, 100, 100)
+        random_floats = np.random.random_sample((100,))
+        random_floats1 = random_ints1*random_floats
+        random_floats2 = random_ints2*random_floats
+        random_floats3 = random_ints3*random_floats
+        random_floats4 = random_ints4*random_floats
+        quadruples = np.array(zip(random_floats1,
+                                  random_floats2,
+                                  random_floats3,
+                                  random_floats4))
+        for quadruple in quadruples:
+            result = gradcheck_naive(poly, quadruple)
+            self.assertTrue(np.sum(result) <= 4*1e-5)
 
 
 def your_sanity_checks():
