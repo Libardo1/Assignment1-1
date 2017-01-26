@@ -51,8 +51,8 @@ def softmax(x):
             row = normalize(row)
 
         stability_constant = np.max(row)
-        y[i] = np.exp(row - stability_constant)/
-        np.sum(np.exp(row - stability_constant))
+        sum_all = np.sum(np.exp(row - stability_constant))
+        y[i] = np.exp(row - stability_constant)/sum_all
 
     # ## END YOUR CODE
     return y
