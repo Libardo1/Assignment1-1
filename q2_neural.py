@@ -26,28 +26,51 @@ def forward_backward_prop(data, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     # ## YOUR CODE HERE: forward propagation
-    all_u = np.array([np.array((x.dot(W1) + b1).flat) for x in data])
+    def fix_shape(array):
+        return np.reshape(array, (array.shape[0], array.shape[2]))
+
+    all_u = fix_shape(np.array([(x.dot(W1) + b1) for x in data]))
     all_h = sigmoid(all_u)
-    all_theta = np.array([np.array((h.dot(W2) + b2).flat) for h in all_h])
-    all_y_hat = np.array([np.array(softmax(theta).flat)
-                         for theta in all_theta])
+    all_theta = fix_shape(np.array([(h.dot(W2) + b2) for h in all_h]))
+    all_y_hat = fix_shape(np.array([softmax(theta) for theta in all_theta]))
     all_costs = np.array([-np.sum(y*np.log(y_hat))
                          for y, y_hat in zip(labels, all_y_hat)])
     cost = np.mean(all_costs)
     # ## END YOUR CODE
 
     # ## YOUR CODE HERE: backward propagation
-    def get_grad_W2(h, y, y_hat):
-        matrix = []
-        for i in range(len(h)):
-            for j in range(len(y_hat)):
-                result = (y_hat[j] - y[j])*h[i]
-                matrix.append(result)
-        matrix = np.reshape(matrix, W2.shape)
+    def del_cost_del_W1(j, i):
+        e_i = np.sum((all_y_hat - labels)*W2[i], 1)
+        sigmoid_u = sigmoid_grad(sigmoid(all_u.T[i]))
+        x_j = data.T[j]
+        return np.mean(e_i*sigmoid_u*x_j)
+
+    def del_cost_del_b1(i, j):
+        size = W2.shape[0]
+        e_i = np.array([np.sum((all_y_hat - labels)* W2[s], 1)
+                       for s in range(size)])
+        sigmoid_u = sigmoid_grad(sigmoid(all_u))
+        return np.mean(e_i*sigmoid_u.T)
+
+    def del_cost_del_W2(i, j):
+        result = [(Y[j] - y[j])*h[i]
+                  for Y, y, h in zip(all_y_hat, labels, all_h)]
+        return np.mean(result)
+
+    def del_cost_del_b2(i, j):
+        return np.mean(np.sum(all_y_hat - labels, 1))
+
+    def get_grad(array, grad_function):
+        matrix = np.array(array, copy=True)
+        for i in range(array.shape[0]):
+            for j in range(array.shape[1]):
+                matrix[i][j] = grad_function(i, j)
         return matrix
 
-    gradW2 = np.array([get_grad_W2(h, y, y_hat)
-                      for h, y, y_hat in zip(all_h, labels, all_y_hat)])
+    gradW1 = get_grad(W1, del_cost_del_W1)
+    gradb1 = get_grad(b1, del_cost_del_b1)
+    gradW2 = get_grad(W2, del_cost_del_W2)
+    gradb2 = get_grad(b2, del_cost_del_b2)
     # ## END YOUR CODE
 
     # ## Stack gradients (do not modify)
@@ -88,7 +111,7 @@ def your_sanity_checks():
     """
     print("Running your sanity checks...")
     # ## YOUR CODE HERE
-    raise NotImplementedError
+    print("Sex is better than machine learning")
     # ## END YOUR CODE
 
 if __name__ == "__main__":
