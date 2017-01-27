@@ -67,7 +67,7 @@ def gradcheck_naive(f, x):
         # useful to add the following:
 
         # else:
-        #    print(str(ix) + ": OK")
+        #     print(str(ix) + ": OK")
 
         # Step to next dimension
         it.iternext()

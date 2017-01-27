@@ -1,6 +1,7 @@
 import numpy as np
 import random
-
+import unittest
+import time
 from q1_softmax import softmax
 from q2_sigmoid import sigmoid, sigmoid_grad
 from q2_gradcheck import gradcheck_naive
@@ -26,43 +27,39 @@ def forward_backward_prop(data, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     # ## YOUR CODE HERE: forward propagation
-    def fix_shape(array):
-        return np.reshape(array, (array.shape[0], array.shape[2]))
-
-    all_u = fix_shape(np.array([(x.dot(W1) + b1) for x in data]))
+    all_u = data.dot(W1) + b1
     all_h = sigmoid(all_u)
-    all_theta = fix_shape(np.array([(h.dot(W2) + b2) for h in all_h]))
-    all_y_hat = fix_shape(np.array([softmax(theta) for theta in all_theta]))
-    all_costs = np.array([-np.sum(y*np.log(y_hat))
-                         for y, y_hat in zip(labels, all_y_hat)])
+    all_theta = all_h.dot(W2) + b2
+    all_y_hat = softmax(all_theta)
+    all_costs = np.sum(labels * np.log(all_y_hat), 1) * -1
     cost = np.mean(all_costs)
     # ## END YOUR CODE
 
     # ## YOUR CODE HERE: backward propagation
     def del_cost_del_W1(j, i):
-        e_i = np.sum((all_y_hat - labels)*W2[i], 1)
-        sigmoid_u = sigmoid_grad(sigmoid(all_u.T[i]))
+        e_i = np.sum((all_y_hat - labels) * W2[i], 1)
+        sigmoid_u_i = sigmoid_grad(sigmoid(all_u.T[i]))
         x_j = data.T[j]
-        return np.mean(e_i*sigmoid_u*x_j)
+        result = e_i*sigmoid_u_i * x_j
+        return np.mean(result)
 
     def del_cost_del_b1(j, i):
         W2_i = W2[i]
-        u_i = sigmoid_grad(sigmoid(all_u.T[i]))
-        subtraction = (all_y_hat - labels)*W2_i
-        multiplication = [vector*scalar
-                          for vector, scalar in zip(subtraction, u_i)]
-        result = np.array(multiplication)
-        result = np.mean(np.sum(result, 1))
-        return result
+        sigmoid_u_i = sigmoid_grad(sigmoid(all_u.T[i]))
+        subtraction = (all_y_hat - labels) * W2_i
+        result = subtraction * sigmoid_u_i[:, np.newaxis]
+        result = np.sum(result, 1)
+        return np.mean(result)
 
     def del_cost_del_W2(i, j):
-        result = [(Y[j] - y[j])*h[i]
-                  for Y, y, h in zip(all_y_hat, labels, all_h)]
+        subtraction_j = (all_y_hat.T[j] - labels.T[j])
+        h_i = all_h.T[i]
+        result = subtraction_j * h_i
         return np.mean(result)
 
     def del_cost_del_b2(i, j):
-        subtraction_j = all_y_hat.T[j] - labels.T[j]
-        return np.mean(subtraction_j)
+        result = all_y_hat.T[j] - labels.T[j]
+        return np.mean(result)
 
     def get_grad(array, grad_function):
         matrix = np.array(array, copy=True)
@@ -106,6 +103,57 @@ def sanity_check():
                                                          dimensions), params)
 
 
+class TestNN(unittest.TestCase):
+
+    def test_data_sizes(self):
+        random_data_sizes = np.random.randint(1, 100, 5)
+        for i in range(5):
+            start = time.time()
+            N = random_data_sizes[i]
+            print("data size = {}".format(N))
+            dimensions = [10, 5, 10]
+            data = np.random.randn(N, dimensions[0])
+            labels = np.zeros((N, dimensions[2]))
+            for i in xrange(N):
+                labels[i, random.randint(0, dimensions[2]-1)] = 1
+            params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
+                dimensions[1] + 1) * dimensions[2], )
+            function = lambda params: forward_backward_prop(data,
+                                                            labels,
+                                                            params,
+                                                            dimensions)
+            result = gradcheck_naive(function, params)
+            self.assertTrue(np.sum(result) <= len(params) * 1e-5)
+            end = time.time()
+            print("Test time = {:f}(s)\n".format(end - start))
+
+    def test_dimensions(self):
+        random_data_sizes = np.random.randint(1, 100, 5)
+        random_Dx = np.random.randint(2, 20, 5)
+        random_H = np.random.randint(2, 20, 5)
+        random_Dy = np.random.randint(2, 20, 5)
+        for i in range(5):
+            start = time.time()
+            N = random_data_sizes[i]
+            dimensions = [random_Dx[i], random_H[i], random_Dy[i]]
+            print("data size = {}".format(N))
+            print("dimensions = {}".format(dimensions))
+            data = np.random.randn(N, dimensions[0])
+            labels = np.zeros((N, dimensions[2]))
+            for i in xrange(N):
+                labels[i, random.randint(0, dimensions[2]-1)] = 1
+            params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
+                dimensions[1] + 1) * dimensions[2], )
+            function = lambda params: forward_backward_prop(data,
+                                                            labels,
+                                                            params,
+                                                            dimensions)
+            result = gradcheck_naive(function, params)
+            self.assertTrue(np.sum(result) <= len(params) * 1e-5)
+            end = time.time()
+            print("Test time = {:f}(s)\n".format(end - start))
+
+
 def your_sanity_checks():
     """
     Use this space add any additional sanity checks by running:
@@ -114,7 +162,11 @@ def your_sanity_checks():
     """
     print("Running your sanity checks...")
     # ## YOUR CODE HERE
-    print("Sex is better than machine learning")
+    suite = unittest.TestSuite()
+    for method in dir(TestNN):
+        if method.startswith("test"):
+            suite.addTest(TestNN(method))
+    unittest.TextTestRunner().run(suite)
     # ## END YOUR CODE
 
 if __name__ == "__main__":
