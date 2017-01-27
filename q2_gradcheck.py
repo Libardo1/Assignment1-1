@@ -19,6 +19,7 @@ def gradcheck_naive(f, x):
     # Evaluate function value at original point
     fx, grad = f(x)
     h = 1e-4
+    test = True
 
     """
      --- about nd.nditer ---
@@ -56,22 +57,22 @@ def gradcheck_naive(f, x):
         reldiff = abs(numgrad - grad[ix]) / max(1, abs(numgrad), abs(grad[ix]))
         all_dif[ix] = reldiff
         if reldiff > 1e-5:
-            print("x[ix] = ", x[ix])
-            print("x_plus_h[ix] = ", x_plus_h[ix])
-            print("x_minus_h[ix] = ", x_minus_h[ix])
-            print("fx = ", fx)
-            print("fxh_minus = ", fxh_minus)
-            print("fxh_plus = ", fxh_plus)
-            print("1/(2*h)", 1/(2*h))
-            print("numgrad = ", numgrad)
-            print("grad[ix] = ", grad[ix])
-            print("First gradient error found at index %s" % str(ix))
-            print("Your gradient: %f \t Numerical gradient: %f" % (grad[ix],
-                                                                   numgrad))
-            return reldiff
+            test = False
+            string = """
+            Your gradient = {0}
+            Numerical gradient = {1}""".format(grad[ix], numgrad)
+            print(str(ix) + ": " + string)
+
+        # For debugging with a bunch of params is
+        # useful to add the following:
+
+        # else:
+        #    print(str(ix) + ": OK")
+
         # Step to next dimension
         it.iternext()
-    print("Gradient check passed!")
+    if test:
+        print("Gradient check passed!")
 
     # add this return to test
     return all_dif

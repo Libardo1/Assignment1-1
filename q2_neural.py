@@ -45,12 +45,15 @@ def forward_backward_prop(data, labels, params, dimensions):
         x_j = data.T[j]
         return np.mean(e_i*sigmoid_u*x_j)
 
-    def del_cost_del_b1(i, j):
-        size = W2.shape[0]
-        e_i = np.array([np.sum((all_y_hat - labels)* W2[s], 1)
-                       for s in range(size)])
-        sigmoid_u = sigmoid_grad(sigmoid(all_u))
-        return np.mean(e_i*sigmoid_u.T)
+    def del_cost_del_b1(j, i):
+        W2_i = W2[i]
+        u_i = sigmoid_grad(sigmoid(all_u.T[i]))
+        subtraction = (all_y_hat - labels)*W2_i
+        multiplication = [vector*scalar
+                          for vector, scalar in zip(subtraction, u_i)]
+        result = np.array(multiplication)
+        result = np.mean(np.sum(result, 1))
+        return result
 
     def del_cost_del_W2(i, j):
         result = [(Y[j] - y[j])*h[i]
@@ -58,7 +61,8 @@ def forward_backward_prop(data, labels, params, dimensions):
         return np.mean(result)
 
     def del_cost_del_b2(i, j):
-        return np.mean(np.sum(all_y_hat - labels, 1))
+        subtraction_j = all_y_hat.T[j] - labels.T[j]
+        return np.mean(subtraction_j)
 
     def get_grad(array, grad_function):
         matrix = np.array(array, copy=True)
@@ -78,7 +82,6 @@ def forward_backward_prop(data, labels, params, dimensions):
                            gradb1.flatten(),
                            gradW2.flatten(),
                            gradb2.flatten()))
-
     return cost, grad
 
 
