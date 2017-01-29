@@ -27,8 +27,8 @@ def forward_backward_prop(data, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     # ## YOUR CODE HERE: forward propagation
-    all_u = data.dot(W1) + b1
-    all_h = sigmoid(all_u)
+    all_mu = data.dot(W1) + b1
+    all_h = sigmoid(all_mu)
     all_theta = all_h.dot(W2) + b2
     all_y_hat = softmax(all_theta)
     all_costs = np.sum(labels * np.log(all_y_hat), 1) * -1
@@ -38,16 +38,16 @@ def forward_backward_prop(data, labels, params, dimensions):
     # ## YOUR CODE HERE: backward propagation
     def del_cost_del_W1(j, i):
         e_i = np.sum((all_y_hat - labels) * W2[i], 1)
-        sigmoid_u_i = sigmoid_grad(sigmoid(all_u.T[i]))
+        sigmoid_mu_i = sigmoid_grad(sigmoid(all_mu.T[i]))
         x_j = data.T[j]
-        result = e_i*sigmoid_u_i * x_j
+        result = e_i*sigmoid_mu_i * x_j
         return np.mean(result)
 
     def del_cost_del_b1(j, i):
         W2_i = W2[i]
-        sigmoid_u_i = sigmoid_grad(sigmoid(all_u.T[i]))
+        sigmoid_mu_i = sigmoid_grad(sigmoid(all_mu.T[i]))
         subtraction = (all_y_hat - labels) * W2_i
-        result = subtraction * sigmoid_u_i[:, np.newaxis]
+        result = subtraction * sigmoid_mu_i[:, np.newaxis]
         result = np.sum(result, 1)
         return np.mean(result)
 
@@ -93,7 +93,7 @@ def sanity_check():
     dimensions = [10, 5, 10]
     data = np.random.randn(N, dimensions[0])   # each row will be a datum
     labels = np.zeros((N, dimensions[2]))
-    for i in xrange(N):
+    for i in range(N):
         labels[i, random.randint(0, dimensions[2]-1)] = 1
 
     params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
@@ -114,7 +114,7 @@ class TestNN(unittest.TestCase):
             dimensions = [10, 5, 10]
             data = np.random.randn(N, dimensions[0])
             labels = np.zeros((N, dimensions[2]))
-            for i in xrange(N):
+            for i in range(N):
                 labels[i, random.randint(0, dimensions[2]-1)] = 1
             params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
                 dimensions[1] + 1) * dimensions[2], )
@@ -140,7 +140,7 @@ class TestNN(unittest.TestCase):
             print("dimensions = {}".format(dimensions))
             data = np.random.randn(N, dimensions[0])
             labels = np.zeros((N, dimensions[2]))
-            for i in xrange(N):
+            for i in range(N):
                 labels[i, random.randint(0, dimensions[2]-1)] = 1
             params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
                 dimensions[1] + 1) * dimensions[2], )

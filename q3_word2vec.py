@@ -5,54 +5,59 @@ from q1_softmax import softmax
 from q2_gradcheck import gradcheck_naive
 from q2_sigmoid import sigmoid, sigmoid_grad
 
+
 def normalizeRows(x):
     """ Row normalization function """
-    # Implement a function that normalizes each row of a matrix to have unit length
-    
-    ### YOUR CODE HERE
-    raise NotImplementedError
-    ### END YOUR CODE
-    
+    # Implement a function that normalizes each
+    # row of a matrix to have unit length
+
+    # ## YOUR CODE HERE
+    all_norm2 = np.sqrt(np.sum(np.power(x, 2), 1))
+    all_norm2 = 1/all_norm2
+    x = x * all_norm2[:, np.newaxis]
+    # ## END YOUR CODE
+
     return x
 
+
 def test_normalize_rows():
-    print "Testing normalizeRows..."
-    x = normalizeRows(np.array([[3.0,4.0],[1, 2]])) 
+    print("Testing normalizeRows...")
+    x = normalizeRows(np.array([[3.0, 4.0], [1, 2]]))
     # the result should be [[0.6, 0.8], [0.4472, 0.8944]]
-    print x
-    assert (x.all() == np.array([[0.6, 0.8], [0.4472, 0.8944]]).all())
-    print ""
+    assert(x.all() == np.array([[0.6, 0.8], [0.4472, 0.8944]]).all())
+    print(" ")
+
 
 def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     """ Softmax cost function for word2vec models """
-    
-    # Implement the cost and gradients for one predicted word vector  
-    # and one target word vector as a building block for word2vec     
-    # models, assuming the softmax prediction function and cross      
-    # entropy loss.                                                   
-    
-    # Inputs:                                                         
-    # - predicted: numpy ndarray, predicted word vector (\hat{v} in 
+
+    # Implement the cost and gradients for one predicted word vector
+    # and one target word vector as a building block for word2vec
+    # models, assuming the softmax prediction function and cross
+    # entropy loss.
+
+    # Inputs:
+    # - predicted: numpy ndarray, predicted word vector (\hat{v} in
     #   the written component or \hat{r} in an earlier version)
-    # - target: integer, the index of the target word               
-    # - outputVectors: "output" vectors (as rows) for all tokens     
-    # - dataset: needed for negative sampling, unused here.         
-    
-    # Outputs:                                                        
-    # - cost: cross entropy cost for the softmax word prediction    
-    # - gradPred: the gradient with respect to the predicted word   
-    #        vector                                                
-    # - grad: the gradient with respect to all the other word        
-    #        vectors                                               
-    
-    # We will not provide starter code for this function, but feel    
-    # free to reference the code you previously wrote for this        
-    # assignment!                                                  
-    
-    ### YOUR CODE HERE
+    # - target: integer, the index of the target word
+    # - outputVectors: "output" vectors (as rows) for all tokens
+    # - dataset: needed for negative sampling, unused here.
+
+    # Outputs:
+    # - cost: cross entropy cost for the softmax word prediction
+    # - gradPred: the gradient with respect to the predicted word
+    #        vector
+    # - grad: the gradient with respect to all the other word
+    #        vectors
+
+    # We will not provide starter code for this function, but feel
+    # free to reference the code you previously wrote for this
+    # assignment!
+
+    # ## YOUR CODE HERE
     raise NotImplementedError
-    ### END YOUR CODE
-    
+    # ## END YOUR CODE
+
     return cost, gradPred, grad
 
 def negSamplingCostAndGradient(predicted, target, outputVectors, dataset, 
@@ -195,4 +200,4 @@ def test_word2vec():
 
 if __name__ == "__main__":
     test_normalize_rows()
-    test_word2vec()
+    #test_word2vec()

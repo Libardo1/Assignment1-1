@@ -66,8 +66,8 @@ def gradcheck_naive(f, x):
         # For debugging with a bunch of params is
         # useful to add the following:
 
-        # else:
-        #     print(str(ix) + ": OK")
+        else:
+            print(str(ix) + ": OK")
 
         # Step to next dimension
         it.iternext()
