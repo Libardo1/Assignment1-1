@@ -27,6 +27,7 @@ def forward_backward_prop(data, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     # ## YOUR CODE HERE: forward propagation
+    N = data.shape[0]
     all_mu = data.dot(W1) + b1
     all_h = sigmoid(all_mu)
     all_theta = all_h.dot(W2) + b2
@@ -36,42 +37,14 @@ def forward_backward_prop(data, labels, params, dimensions):
     # ## END YOUR CODE
 
     # ## YOUR CODE HERE: backward propagation
-    def del_cost_del_W1(j, i):
-        e_i = np.sum((all_y_hat - labels) * W2[i], 1)
-        sigmoid_mu_i = sigmoid_grad(sigmoid(all_mu.T[i]))
-        x_j = data.T[j]
-        result = e_i*sigmoid_mu_i * x_j
-        return np.mean(result)
-
-    def del_cost_del_b1(j, i):
-        W2_i = W2[i]
-        sigmoid_mu_i = sigmoid_grad(sigmoid(all_mu.T[i]))
-        subtraction = (all_y_hat - labels) * W2_i
-        result = subtraction * sigmoid_mu_i[:, np.newaxis]
-        result = np.sum(result, 1)
-        return np.mean(result)
-
-    def del_cost_del_W2(i, j):
-        subtraction_j = (all_y_hat.T[j] - labels.T[j])
-        h_i = all_h.T[i]
-        result = subtraction_j * h_i
-        return np.mean(result)
-
-    def del_cost_del_b2(i, j):
-        result = all_y_hat.T[j] - labels.T[j]
-        return np.mean(result)
-
-    def get_grad(array, grad_function):
-        matrix = np.array(array, copy=True)
-        for i in range(array.shape[0]):
-            for j in range(array.shape[1]):
-                matrix[i][j] = grad_function(i, j)
-        return matrix
-
-    gradW1 = get_grad(W1, del_cost_del_W1)
-    gradb1 = get_grad(b1, del_cost_del_b1)
-    gradW2 = get_grad(W2, del_cost_del_W2)
-    gradb2 = get_grad(b2, del_cost_del_b2)
+    subtraction = all_y_hat - labels
+    E = np.dot(W2, subtraction.T)
+    sig_mu = sigmoid_grad(sigmoid(all_mu.T))
+    E_sig_mu_mult = E * sig_mu
+    gradW1 = np.dot(data.T, E_sig_mu_mult.T) * 1/N
+    gradb1 = np.sum(E_sig_mu_mult, 1) * 1/N
+    gradW2 = np.dot(all_h.T, subtraction) * 1/N
+    gradb2 = np.sum(subtraction.T, 1) * 1/N
     # ## END YOUR CODE
 
     # ## Stack gradients (do not modify)

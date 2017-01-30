@@ -55,36 +55,18 @@ def softmaxCostAndGradient(predicted, target, outputVectors, dataset):
     # assignment!
 
     # ## YOUR CODE HERE
-    v_hat = predicted
-    o = target
-    U = outputVectors
-    y_hat = (softmax(U.dot(v_hat))).flatten()
-    y = np.zeros(U.shape[0])
-    y[o] = 1
+    y_hat = (softmax(outputVectors.dot(predicted))).flatten()
+    y = np.zeros(outputVectors.shape[0])
+    y[target] = 1
     cost = np.sum(y * np.log(y_hat)) * -1
-
-    def del_cost_del_v_hat(i):
-        subtraction = y_hat - y
-        u_w_i = U.T[i]
-        result = subtraction * u_w_i
-        return np.sum(result)
-
-    def del_cost_del_U_i(i):
-        return v_hat*(y_hat[i] - y[i])
-
-    def get_grad(array, grad_function):
-        matrix = np.array(array, copy=True)
-        for i in range(array.shape[0]):
-                matrix[i] = grad_function(i)
-        return matrix
-
-    gradPred = get_grad(v_hat, del_cost_del_v_hat)
-    grad = get_grad(U, del_cost_del_U_i)
+    subtraction = y_hat - y
+    gradPred = np.sum(subtraction*outputVectors.T, 1)
+    grad = np.outer(subtraction, predicted)
     # ## END YOUR CODE
 
     return cost, gradPred, grad
 
-def negSamplingCostAndGradient(predicted, target, outputVectors, dataset, 
+def negSamplingCostAndGradient(predicted, target, outputVectors, dataset,
     K=10):
     """ Negative sampling cost function for word2vec models """
 
