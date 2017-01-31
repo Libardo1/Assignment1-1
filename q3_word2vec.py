@@ -1,6 +1,6 @@
 import numpy as np
 import random
-
+from collections import Counter
 from q1_softmax import softmax
 from q2_gradcheck import gradcheck_naive
 from q2_sigmoid import sigmoid, sigmoid_grad
@@ -94,7 +94,7 @@ def negSamplingCostAndGradient(predicted,
         pick_idx = dataset.sampleTokenIdx()
         if pick_idx != target:
             random_sample.append(pick_idx)
-    sample_vectors = outputVectors[random_sample]
+    sample_vectors = outputVectors[random_sample, :]
     target_pred = outputVectors[target].dot(predicted)
     sample_pred = sample_vectors.dot(predicted)
     cost = - (np.log(sigmoid(target_pred)) +
@@ -105,8 +105,10 @@ def negSamplingCostAndGradient(predicted,
 
     grad = np.zeros(outputVectors.shape)
     grad[target] = - sigmoid(- target_pred) * predicted
-    for i in random_sample:
-        grad[i] += sigmoid(outputVectors[i].dot(predicted)) * predicted
+    counter = Counter(random_sample)
+    for i in counter.keys():
+        grad[i] = counter[i]*(sigmoid(outputVectors[i].dot(predicted)) *
+                              predicted)
 
     # ## END YOUR CODE
 
