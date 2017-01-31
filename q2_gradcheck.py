@@ -61,10 +61,10 @@ def gradcheck_naive(f, x):
             string = """
             Your gradient = {0}
             Numerical gradient = {1}""".format(grad[ix], numgrad)
-            print(str(ix) + ": " + string)
-            print("fx ={}".format(fx))
-            print("fxh_plus ={}".format(fxh_plus))
-            print("fxh_minus ={}".format(fxh_minus))
+            print("            " + str(ix) + ": " + string)
+            print("            fx ={}".format(fx))
+            print("            fxh_plus ={}".format(fxh_plus))
+            print("            fxh_minus ={}\n".format(fxh_minus))
         # For debugging with a bunch of params is
         # useful to add the following:
 
