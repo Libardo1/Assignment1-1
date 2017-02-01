@@ -149,7 +149,20 @@ def skipgram(currentWord,
     # assignment!
 
     # ## YOUR CODE HERE
-    raise NotImplementedError
+    current_index = tokens[currentWord]
+    v_hat = inputVectors[current_index]
+    cost = 0
+    gradIn = np.zeros(inputVectors.shape)
+    gradOut = np.zeros(outputVectors.shape)
+    for word in contextWords:
+        target = tokens[word]
+        word_cost, word_gradPred, word_grad = word2vecCostAndGradient(v_hat,
+                                                                      target,
+                                                                      outputVectors,
+                                                                      dataset)
+        cost += word_cost
+        gradIn[current_index] += word_gradPred
+        gradOut += word_grad
     # ## END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -176,12 +189,21 @@ def cbow(currentWord,
     # ASSIGNMENT ARE NOT!                                           #
     #################################################################
 
+    # ## YOUR CODE HERE
+    current_index = tokens[currentWord]
+    v_hat = inputVectors[current_index]
     cost = 0
     gradIn = np.zeros(inputVectors.shape)
     gradOut = np.zeros(outputVectors.shape)
-
-    # ## YOUR CODE HERE
-    raise NotImplementedError
+    for word in contextWords:
+        target = tokens[word]
+        word_cost, word_gradPred, word_grad = word2vecCostAndGradient(v_hat,
+                                                                      target,
+                                                                      outputVectors,
+                                                                      dataset)
+        cost += word_cost
+        gradIn[current_index] += word_gradPred
+        gradOut += word_grad
     # ## END YOUR CODE
 
     return cost, gradIn, gradOut
@@ -236,9 +258,9 @@ def test_word2vec():
 
     def getRandomContext(C):
         tokens = ["a", "b", "c", "d", "e"]
-        return tokens[random.randint(0, 4)],
-        [tokens[random.randint(0, 4)]
-         for i in xrange(2*C)]
+        center_word = tokens[random.randint(0, 4)]
+        context = [tokens[random.randint(0, 4)] for i in xrange(2*C)]
+        return center_word, context
 
     dataset.sampleTokenIdx = dummySampleTokenIdx
     dataset.getRandomContext = getRandomContext
@@ -272,23 +294,30 @@ def test_word2vec():
     #                                                  5,
     #                                                  negSamplingCostAndGradient), dummy_vectors)
 
-    print "\n=== Results ==="
-    result1 = skipgram("c",
-                       3,
-                       ["a", "b", "e", "d", "b", "c"],
-                       dummy_tokens,
-                       dummy_vectors[:5, :],
-                       dummy_vectors[5:, :],
-                       dataset)
+    # print "\n=== Results ==="
+    # result1 = skipgram("c",
+    #                        3,
+    #                        ["a", "b", "e", "d", "b", "c"],
+    #                        dummy_tokens,
+    #                        dummy_vectors[:5, :],
+    #                        dummy_vectors[5:, :],
+    #                        dataset)
 
-    result2 = skipgram("c",
-                       1,
-                       ["a", "b"],
-                       dummy_tokens,
-                       dummy_vectors[:5, :],
-                       dummy_vectors[5:, :],
-                       dataset,
-                       negSamplingCostAndGradient)
+    # result2 = skipgram1("c",
+    #                        3,
+    #                        ["a", "b", "e", "d", "b", "c"],
+    #                        dummy_tokens,
+    #                        dummy_vectors[:5, :],
+    #                        dummy_vectors[5:, :],
+    #                        dataset)
+    # result2 = skipgram("c",
+    #                    1,
+    #                    ["a", "b"],
+    #                    dummy_tokens,
+    #                    dummy_vectors[:5, :],
+    #                    dummy_vectors[5:, :],
+    #                    dataset,
+    #                    negSamplingCostAndGradient)
 
     # result3 = cbow("a",
     #                2,
@@ -307,8 +336,11 @@ def test_word2vec():
     #                dataset,
     #                negSamplingCostAndGradient)
 
-    print(result1)
-    print(result2)
+    # print(result1[1])
+    # print(result1[2])
+    # print(result2[0])
+    # print(result2[1])
+    # print(result2[2])
     # print(result3)
     # print(result4)
 
