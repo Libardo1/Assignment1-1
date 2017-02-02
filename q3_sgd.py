@@ -7,7 +7,7 @@ import unittest
 from q3_word2vec import normalizeRows
 
 # Save parameters every a few SGD iterations as fail-safe
-SAVE_PARAMS_EVERY = 1000
+SAVE_PARAMS_EVERY = 10
 
 
 def load_saved_params():

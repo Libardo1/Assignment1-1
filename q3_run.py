@@ -1,17 +1,15 @@
+from datetime import datetime, timedelta
+import time
 import random
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-# import sys
-# parent_path = path.abspath('..')
-# sys.path.insert(0, parent_path)
 from cs224d.data_utils import *
-
 from q3_word2vec import *
 from q3_sgd import *
-print("imports ok")
+
+start = time.time()
 # Reset the random seed to make sure that everyone gets the same results
 random.seed(314)
 dataset = StanfordSentiment()
@@ -24,6 +22,9 @@ dimVectors = 10
 # Context size
 C = 5
 
+# number of traing steps
+num_steps = 15
+
 # Reset the random seed to make sure that everyone gets the same results
 random.seed(31415)
 np.random.seed(9265)
@@ -32,7 +33,7 @@ wordVectors = np.concatenate(((np.random.rand(nWords, dimVectors) - .5) / \
 wordVectors0 = sgd(
     lambda vec: word2vec_sgd_wrapper(skipgram, tokens, vec, dataset, C, 
     	negSamplingCostAndGradient), 
-    wordVectors, 0.3, 40, None, True, PRINT_EVERY=10)
+    wordVectors, 0.3, num_steps, None, True, PRINT_EVERY=10)
 print "sanity check: cost at convergence should be around or below 10"
 
 # sum the input and output word vectors
@@ -60,4 +61,12 @@ plt.xlim((np.min(coord[:,0]), np.max(coord[:,0])))
 plt.ylim((np.min(coord[:,1]), np.max(coord[:,1])))
 
 plt.savefig('q3_word_vectors.png')
-plt.show()
+# plt.show()
+end = time.time()
+
+general_duration = end - start
+sec = timedelta(seconds=int(general_duration))
+d_time = datetime(1, 1, 1) + sec
+print('The duration of the whole training with % s steps is %.2f seconds,' % (num_steps, general_duration))
+print "which is equal to:  %d:%d:%d:%d" % (d_time.day-1, d_time.hour, d_time.minute, d_time.second),
+print(" (DAYS:HOURS:MIN:SEC)")
