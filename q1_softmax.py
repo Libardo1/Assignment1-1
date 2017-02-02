@@ -8,10 +8,8 @@ from math import isnan
 def normalize(arr):
     size = len(arr)
     sum_all = np.sum(arr)
-    y = np.ndarray(shape=(size), dtype=float)
-    for i in range(size):
-        y[i] = arr[i]/sum_all
-    return y
+    arr = arr*(1/sum_all)
+    return arr
 
 
 def softmax(x):
