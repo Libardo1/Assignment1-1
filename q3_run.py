@@ -1,11 +1,17 @@
 import random
 import numpy as np
-from cs224d.data_utils import *
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+# import sys
+# parent_path = path.abspath('..')
+# sys.path.insert(0, parent_path)
+from cs224d.data_utils import *
 
 from q3_word2vec import *
 from q3_sgd import *
-
+print("imports ok")
 # Reset the random seed to make sure that everyone gets the same results
 random.seed(314)
 dataset = StanfordSentiment()
@@ -26,7 +32,7 @@ wordVectors = np.concatenate(((np.random.rand(nWords, dimVectors) - .5) / \
 wordVectors0 = sgd(
     lambda vec: word2vec_sgd_wrapper(skipgram, tokens, vec, dataset, C, 
     	negSamplingCostAndGradient), 
-    wordVectors, 0.3, 40000, None, True, PRINT_EVERY=10)
+    wordVectors, 0.3, 40, None, True, PRINT_EVERY=10)
 print "sanity check: cost at convergence should be around or below 10"
 
 # sum the input and output word vectors
