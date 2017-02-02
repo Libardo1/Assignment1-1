@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 import time
 import random
 import numpy as np
-# import matplotlib
-# matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from cs224d.data_utils import *
 from q3_word2vec import *
@@ -23,7 +23,7 @@ dimVectors = 10
 C = 5
 
 # number of traing steps
-num_steps = 15
+num_steps = 40000
 
 # Reset the random seed to make sure that everyone gets the same results
 random.seed(31415)
