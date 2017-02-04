@@ -70,7 +70,7 @@ def softmaxRegression(features,
     all_one_hot = np.zeros((N, num_classes))
     all_one_hot[np.arange(len(labels)), labels] = 1
     subtraction = prob - all_one_hot
-    grad = (np.dot(features.T, subtraction) / N) + weights
+    grad = (np.dot(features.T, subtraction) / N) + (weights * regularization)
     pred = np.argmax(prob, axis=1)
     # ## END YOUR CODE
 
@@ -122,9 +122,24 @@ def sanity_check():
                                                       1.0,
                                                       nopredictions=True),
                     dummy_weights)
-
+    gradcheck_naive(lambda weights: softmaxRegression(dummy_features,
+                                                      dummy_labels,
+                                                      weights,
+                                                      2.7,
+                                                      nopredictions=True),
+                    dummy_weights)
+    gradcheck_naive(lambda weights: softmaxRegression(dummy_features,
+                                                      dummy_labels,
+                                                      weights,
+                                                      0,
+                                                      nopredictions=True),
+                    dummy_weights)
     print("\n=== Results ===")
-    print(softmaxRegression(dummy_features, dummy_labels, dummy_weights, 1.0))
+    predictions_example = softmaxRegression(dummy_features,
+                                            dummy_labels,
+                                            dummy_weights,
+                                            1.0)[2]
+    print(predictions_example)
 
 if __name__ == "__main__":
     sanity_check()
