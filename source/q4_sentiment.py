@@ -17,11 +17,32 @@ from q4_softmaxreg import softmaxRegression,\
  getSentenceFeature, accuracy, softmax_wrapper
 
 parser = argparse.ArgumentParser()
+
 parser.add_argument("-p",
                     "--password",
                     type=str,
                     default='None',
-                    help="""Password for the robotnara mail.(default=None)""")
+                    help="""Password for the robotanara mail.(default=None)""")
+
+parser.add_argument("-s",
+                    "--steps",
+                    type=int,
+                    default=10000,
+                    help="number of training steps (default=10000)")
+
+parser.add_argument("-e",
+                    "--every",
+                    type=int,
+                    default=100,
+                    help="Show result every x steps (default=100)")
+
+
+parser.add_argument("-l",
+                    "--learning",
+                    type=float,
+                    default=3.0,
+                    help="learning rate (default=3.0)")
+
 
 args = parser.parse_args()
 
@@ -90,17 +111,15 @@ for regularization in REGULARIZATION:
     weights = np.random.randn(dimVectors, 5)
     print("Training for reg=%f" % regularization)
 
-    training_steps = 1
-
     # We will do batch optimization
     weights = sgd(lambda weights: softmax_wrapper(trainFeatures,
                                                   trainLabels,
                                                   weights,
                                                   regularization),
                   weights,
-                  3,
-                  training_steps,
-                  PRINT_EVERY=100)
+                  args.learning,
+                  args.steps,
+                  PRINT_EVERY=args.every)
 
     # Test on train set
     _, _, pred = softmaxRegression(trainFeatures, trainLabels, weights)
@@ -169,7 +188,7 @@ plt.savefig("q4_reg_v_acc.png")
 
 # Getting the duration of the process
 end = time.time()
-num_steps = training_steps*len(REGULARIZATION)
+num_steps = args.steps*len(REGULARIZATION)
 general_duration = end - start
 sec = timedelta(seconds=int(general_duration))
 d_time = datetime(1, 1, 1) + sec
