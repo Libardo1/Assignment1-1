@@ -1,21 +1,29 @@
+import numpy as np
+import os
+import time
+import argparse
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.MIMEBase import MIMEBase
 from email import encoders
-import os
-from datetime import datetime, timedelta
-import time
-import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
+from datetime import datetime, timedelta
 from cs224d.data_utils import *
-
 from q3_sgd import load_saved_params, sgd
 from q4_softmaxreg import softmaxRegression,\
  getSentenceFeature, accuracy, softmax_wrapper
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p",
+                    "--password",
+                    type=str,
+                    default='None',
+                    help="""Password for the robotnara mail.(default=None)""")
+
+args = parser.parse_args()
 
 start = time.time()
 
@@ -34,6 +42,7 @@ REGULARIZATION = None   # Assign a list of floats in the block below
 # REGULARIZATION = np.concatenate((reg0, reg_plus, reg_minus))
 REGULARIZATION = [0.0,
                   0.00001,
+                  0.00002,
                   0.00003,
                   0.0001,
                   0.0003,
@@ -169,50 +178,53 @@ print "which is equal to:  %d:%d:%d:%d" % (d_time.day-1, d_time.hour, d_time.min
 print(" (DAYS:HOURS:MIN:SEC)")
 
 # Sending an email with the results
-cwd = os.getcwd()
+if args.password != "None":
+    cwd = os.getcwd()
 
-script_name = "q4_sentiment.py"
+    script_name = "q4_sentiment.py"
 
-fromaddr = "robotanara@gmail.com"
-toaddr = "felipessalvador@gmail.com"
-msg = MIMEMultipart()
-msg['From'] = fromaddr
-msg['To'] = toaddr
-msg['Subject'] = "End of {}".format(script_name)
+    fromaddr = "robotanara@gmail.com"
+    toaddr = "felipessalvador@gmail.com"
+    msg = MIMEMultipart()
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
+    msg['Subject'] = "End of {}".format(script_name)
 
-body = """Dear Felipe,
-the script {} is done.
-A review of the process can be seen in the following attachments.
+    body = """Dear Felipe,
+    the script {} is done.
+    A review of the process can be seen in the following attachments.
 
-Best,
-Nara""".format(script_name)
-msg.attach(MIMEText(body, 'plain'))
+    Best,
+    Nara""".format(script_name)
+    msg.attach(MIMEText(body, 'plain'))
 
-filename1 = "nohup.out"
-attachment1 = open(cwd + '/' + filename1, "rb")
+    filename1 = "nohup.out"
+    attachment1 = open(cwd + '/' + filename1, "rb")
 
-part1 = MIMEBase('application', 'octet-stream')
-part1.set_payload((attachment1).read())
-encoders.encode_base64(part1)
-part1.add_header('Content-Disposition', "attachment; filename= %s" % filename1)
+    part1 = MIMEBase('application', 'octet-stream')
+    part1.set_payload((attachment1).read())
+    encoders.encode_base64(part1)
+    part1.add_header('Content-Disposition',
+                     "attachment; filename= %s" % filename1)
 
-msg.attach(part1)
+    msg.attach(part1)
 
-filename2 = "q4_reg_v_acc.png"
-attachment2 = open(cwd + '/' + filename2, "rb")
+    filename2 = "q4_reg_v_acc.png"
+    attachment2 = open(cwd + '/' + filename2, "rb")
 
-part2 = MIMEBase('application', 'octet-stream')
-part2.set_payload((attachment2).read())
-encoders.encode_base64(part2)
-part2.add_header('Content-Disposition', "attachment; filename= %s" % filename2)
+    part2 = MIMEBase('application', 'octet-stream')
+    part2.set_payload((attachment2).read())
+    encoders.encode_base64(part2)
+    part2.add_header('Content-Disposition',
+                     "attachment; filename= %s" % filename2)
 
-msg.attach(part2)
+    msg.attach(part2)
 
-password = os.environ.get('MY_ENV_VAR')
+    password = args.password
 
-server = smtplib.SMTP('smtp.gmail.com', 587)
-server.starttls()
-server.login(fromaddr, password)
-text = msg.as_string()
-server.sendmail(fromaddr, toaddr, text)
-server.quit()
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(fromaddr, password)
+    text = msg.as_string()
+    server.sendmail(fromaddr, toaddr, text)
+    server.quit()
