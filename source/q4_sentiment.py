@@ -90,7 +90,7 @@ for regularization in REGULARIZATION:
     weights = np.random.randn(dimVectors, 5)
     print("Training for reg=%f" % regularization)
 
-    training_steps = 1
+    training_steps = 10000
 
     # We will do batch optimization
     weights = sgd(lambda weights: softmax_wrapper(trainFeatures,
