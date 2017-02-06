@@ -1,3 +1,9 @@
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from email.MIMEBase import MIMEBase
+from email import encoders
+import os
 from datetime import datetime, timedelta
 import time
 import numpy as np
@@ -75,7 +81,7 @@ for regularization in REGULARIZATION:
     weights = np.random.randn(dimVectors, 5)
     print("Training for reg=%f" % regularization)
 
-    training_steps = 10000
+    training_steps = 1
 
     # We will do batch optimization
     weights = sgd(lambda weights: softmax_wrapper(trainFeatures,
@@ -152,6 +158,7 @@ plt.legend(['train', 'dev'], loc='upper left')
 plt.savefig("q4_reg_v_acc.png")
 # plt.show()
 
+# Getting the duration of the process
 end = time.time()
 num_steps = training_steps*len(REGULARIZATION)
 general_duration = end - start
@@ -160,3 +167,52 @@ d_time = datetime(1, 1, 1) + sec
 print('The duration of the whole training with % s steps is %.2f seconds,' % (num_steps, general_duration))
 print "which is equal to:  %d:%d:%d:%d" % (d_time.day-1, d_time.hour, d_time.minute, d_time.second),
 print(" (DAYS:HOURS:MIN:SEC)")
+
+# Sending an email with the results
+cwd = os.getcwd()
+
+script_name = "q4_sentiment.py"
+
+fromaddr = "robotanara@gmail.com"
+toaddr = "felipessalvador@gmail.com"
+msg = MIMEMultipart()
+msg['From'] = fromaddr
+msg['To'] = toaddr
+msg['Subject'] = "End of {}".format(script_name)
+
+body = """Dear Felipe,
+the script {} is done.
+A review of the process can be seen in the following attachments.
+
+Best,
+Nara""".format(script_name)
+msg.attach(MIMEText(body, 'plain'))
+
+filename1 = "nohup.out"
+attachment1 = open(cwd + '/' + filename1, "rb")
+
+part1 = MIMEBase('application', 'octet-stream')
+part1.set_payload((attachment1).read())
+encoders.encode_base64(part1)
+part1.add_header('Content-Disposition', "attachment; filename= %s" % filename1)
+
+msg.attach(part1)
+
+filename2 = "q4_reg_v_acc.png"
+attachment2 = open(cwd + '/' + filename2, "rb")
+
+part2 = MIMEBase('application', 'octet-stream')
+part2.set_payload((attachment2).read())
+encoders.encode_base64(part2)
+part2.add_header('Content-Disposition', "attachment; filename= %s" % filename2)
+
+msg.attach(part2)
+
+password = os.environ.get('MY_ENV_VAR')
+
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls()
+server.login(fromaddr, password)
+text = msg.as_string()
+server.sendmail(fromaddr, toaddr, text)
+server.quit()
