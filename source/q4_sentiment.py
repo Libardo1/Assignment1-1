@@ -1,4 +1,8 @@
+from datetime import datetime, timedelta
+import time
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from cs224d.data_utils import *
@@ -6,6 +10,8 @@ from cs224d.data_utils import *
 from q3_sgd import load_saved_params, sgd
 from q4_softmaxreg import softmaxRegression,\
  getSentenceFeature, accuracy, softmax_wrapper
+
+start = time.time()
 
 # Try different regularizations and pick the best!
 # NOTE: fill in one more "your code here" below before running!
@@ -20,7 +26,16 @@ REGULARIZATION = None   # Assign a list of floats in the block below
 # reg2 = np.random.random_sample([1]) / 50
 # reg3 = np.random.random_sample([1]) / 1000
 # REGULARIZATION = np.concatenate((reg0, reg_plus, reg_minus))
-REGULARIZATION = np.array([0.0, 0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01])
+REGULARIZATION = [0.0,
+                  0.00001,
+                  0.00003,
+                  0.0001,
+                  0.0003,
+                  0.001,
+                  0.003,
+                  0.03,
+                  0.01]
+REGULARIZATION.sort()
 print("All the regularization params are = {}".format(REGULARIZATION))
 # ## END YOUR CODE
 
@@ -60,8 +75,7 @@ for regularization in REGULARIZATION:
     weights = np.random.randn(dimVectors, 5)
     print("Training for reg=%f" % regularization)
 
-    training_steps = 5000
-    # training_steps = 100
+    training_steps = 10000
 
     # We will do batch optimization
     weights = sgd(lambda weights: softmax_wrapper(trainFeatures,
@@ -136,4 +150,13 @@ plt.xlabel("regularization")
 plt.ylabel("accuracy")
 plt.legend(['train', 'dev'], loc='upper left')
 plt.savefig("q4_reg_v_acc.png")
-plt.show()
+# plt.show()
+
+end = time.time()
+num_steps = training_steps*len(REGULARIZATION)
+general_duration = end - start
+sec = timedelta(seconds=int(general_duration))
+d_time = datetime(1, 1, 1) + sec
+print('The duration of the whole training with % s steps is %.2f seconds,' % (num_steps, general_duration))
+print "which is equal to:  %d:%d:%d:%d" % (d_time.day-1, d_time.hour, d_time.minute, d_time.second),
+print(" (DAYS:HOURS:MIN:SEC)")
