@@ -52,25 +52,26 @@ start = time.time()
 # NOTE: fill in one more "your code here" below before running!
 REGULARIZATION = None   # Assign a list of floats in the block below
 # ## YOUR CODE HERE
-# best_so_far = 8.410683E-02
-# reg0 = np.array([best_so_far, 3.320813E-02])
-# reg_plus = np.random.random_sample([2]) / 100
-# reg_plus += best_so_far
-# reg_minus = - np.random.random_sample([2]) / 100
-# reg_minus += best_so_far
-# reg2 = np.random.random_sample([1]) / 50
-# reg3 = np.random.random_sample([1]) / 1000
-# REGULARIZATION = np.concatenate((reg0, reg_plus, reg_minus))
-REGULARIZATION = [0.0,
-                  0.00001,
-                  0.00002,
-                  0.00003,
-                  0.0001,
-                  0.0003,
-                  0.001,
-                  0.003,
-                  0.03,
-                  0.01]
+reg_minus2 = np.random.random_sample([2]) / 10
+reg_minus3 = np.random.random_sample([2]) / 100
+reg_minus4 = np.random.random_sample([2]) / 1000
+reg_minus5 = np.random.random_sample([2]) / 10000
+reg_minus6 = np.random.random_sample([2]) / 100000
+REGULARIZATION = np.concatenate((reg_minus2,
+                                 reg_minus3,
+                                 reg_minus4,
+                                 reg_minus5,
+                                 reg_minus6))
+# REGULARIZATION = [0.0,
+#                  0.00001,
+#                  0.00002,
+#                  0.00003,
+#                  0.0001,
+#                  0.0003,
+#                  0.001,
+#                  0.003,
+#                  0.03,
+#                  0.01]
 REGULARIZATION.sort()
 print("All the regularization params are = {}".format(REGULARIZATION))
 # ## END YOUR CODE
