@@ -34,7 +34,7 @@ parser.add_argument("-e",
                     "--every",
                     type=int,
                     default=100,
-                    help="Show result every x steps (default=100)")
+                    help="Show result for every x steps (default=100)")
 
 
 parser.add_argument("-l",
