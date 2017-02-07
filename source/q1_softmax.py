@@ -4,14 +4,6 @@ import unittest
 from math import isnan
 
 
-# fuction to normalize an array
-def normalize(arr):
-    size = len(arr)
-    sum_all = np.sum(arr)
-    arr = arr*(1/sum_all)
-    return arr
-
-
 def softmax(x):
     """
     Compute the softmax function for each row of the input x.
@@ -35,23 +27,15 @@ def softmax(x):
 
     # when x is an one dimensional input
     # we transform it in an array having
-    # x as its only mem
+    # x as its only member
     if type(x[0]) != np.ndarray:
         x = x.reshape((1, len(x)))
-
-    nrows = len(x)
-    ncols = len(x[0])
-    y = np.ndarray(shape=(nrows, ncols), dtype=float)
-    for i, row in enumerate(x):
-
-        # when the array has a high std we normalize the array
-        if np.std(row) >= 290:
-            row = normalize(row)
-
-        stability_constant = np.max(row)
-        sum_all = np.sum(np.exp(row - stability_constant))
-        y[i] = np.exp(row - stability_constant)/sum_all
-
+    all_constants = - np.amax(x, axis=1)
+    x = x+all_constants[:, np.newaxis]
+    x = np.exp(x)
+    all_sums = np.sum(x, 1)
+    all_sums = np.power(all_sums, -1)
+    y = x*all_sums[:, np.newaxis]
     # ## END YOUR CODE
     return y
 
@@ -88,7 +72,7 @@ class TestSoftmax(unittest.TestCase):
     # np.sum(softmax(y)) = 1.0000000000000002
     # I don't know if this is a problem or not. So I change
     def test_upperbound(self):
-        for k in range(300):
+        for k in range(500):
             y = np.ndarray(shape=(10), dtype=float)
             for i in range(10):
                 y[i] = random.randint(-100, 100)
@@ -100,21 +84,21 @@ class TestSoftmax(unittest.TestCase):
 
     # Here we test if the softmax function can handle
     # arrays with high std like [1001,1,1,1]
-    def test_high_std(self):
-        for k in range(300):
-            y = np.ndarray(shape=(10), dtype=float)
-            for i in range(0, 9):
-                y[i] = random.randint(1, 3)
-            y[9] = random.randint(1001, 1100)
-            self.assertFalse(isnan(np.sum(softmax(y))),
-                             """\n if y = {0} \n, then std = {1}
-                             and the softmax will not work"""
-                             .format(y, np.std(y)))
+    # def test_high_std(self):
+        # for k in range(300):
+            # y = np.ndarray(shape=(10), dtype=float)
+            # for i in range(0, 9):
+            #    y[i] = random.randint(1, 3)
+            # y[9] = random.randint(1001, 1100)
+            # self.assertFalse(isnan(np.sum(softmax(y))),
+            #                """\n if y = {0} \n, then std = {1}
+            #                 and the softmax will not work"""
+            #                 .format(y, np.std(y)))
 
     # Here we test if the softmax function can handle
     # arrays with big and and low numbers
     def test_high_low(self):
-        for k in range(300):
+        for k in range(500):
             y = np.ndarray(shape=(2, 2), dtype=float)
             y[0][0] = random.randint(-20000, -10000)
             y[0][1] = y[0][0]+1
