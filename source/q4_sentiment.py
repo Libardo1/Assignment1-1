@@ -52,11 +52,11 @@ start = time.time()
 # NOTE: fill in one more "your code here" below before running!
 REGULARIZATION = None   # Assign a list of floats in the block below
 # ## YOUR CODE HERE
-reg_minus2 = np.random.random_sample([2]) / 10
-reg_minus3 = np.random.random_sample([2]) / 100
-reg_minus4 = np.random.random_sample([2]) / 1000
-reg_minus5 = np.random.random_sample([2]) / 10000
-reg_minus6 = np.random.random_sample([2]) / 100000
+reg_minus2 = np.random.random_sample([8]) / 10
+reg_minus3 = np.random.random_sample([8]) / 100
+reg_minus4 = np.random.random_sample([8]) / 1000
+reg_minus5 = np.random.random_sample([8]) / 10000
+reg_minus6 = np.random.random_sample([8]) / 100000
 REGULARIZATION = np.concatenate((reg_minus2,
                                  reg_minus3,
                                  reg_minus4,
