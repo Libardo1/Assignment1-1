@@ -62,16 +62,6 @@ REGULARIZATION = np.concatenate((reg_minus2,
                                  reg_minus4,
                                  reg_minus5,
                                  reg_minus6))
-# REGULARIZATION = [0.0,
-#                  0.00001,
-#                  0.00002,
-#                  0.00003,
-#                  0.0001,
-#                  0.0003,
-#                  0.001,
-#                  0.003,
-#                  0.03,
-#                  0.01]
 REGULARIZATION.sort()
 print("All the regularization params are = {}".format(REGULARIZATION))
 # ## END YOUR CODE
