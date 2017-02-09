@@ -9,8 +9,9 @@ This repository contains all my solutions for the [Assigment 1](http://cs224d.st
 ## Usage
 
 ```
-$ bash source/cs224d/datasets/get_datasets.sh 
-cd source/
+$ cd source/cs224d/datasets 
+bash get_datasets.sh
+cd ../..
 python q3_run.py
 bash test.sh
 python q4_sentiment.py
